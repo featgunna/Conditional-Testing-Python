@@ -1,6 +1,10 @@
 # Conditional Testing Module in Python
 ## Overview:
-This repository implements conditional testing in Python
+This repository implements conditional testing in Python.
+
+The file conditional_testing.py contains the source code, file sample_code.py is a sample code
+to be used in testing, test_file.py is a sample test file and the file tests_missing.py provides the tests
+missing from test_file.py to reach 100% conditional coverage.
 
 ## Report example
 

@@ -253,7 +253,7 @@ def testing_report(ast_parser):
 
 
         if current_fork != forks_count:
-            print("-" * 100)
+            print("-" * ((terminal_width * 2) // 3))
 
     if total_branches == 0:
         overall_score = 100
