@@ -16,7 +16,7 @@ missing from test_file.py to reach 100% conditional coverage.
 python3 conditional_testing.py <code_file.py> <testing_files.py>
 ```
 
-### For the code and testing files provided in the repository:
+### For the code and testing files provided in the repository (several testing files separated by spaces can be entered):
 ```bash
 python3 conditional_testing.py sample_code.py test_file.py tests_missing.py
 ```
