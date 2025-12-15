@@ -6,6 +6,9 @@ The file conditional_testing.py contains the source code, file sample_code.py is
 to be used in testing, test_file.py is a sample test file and the file tests_missing.py provides the tests
 missing from test_file.py to reach 100% conditional coverage.
 
+The code supports the usage of several testing files in one run, returning the combined conditional coverage of all tests
+encountered in all provided testing files. Multiple testing files should be separated by spaces in the command line call.
+
 ## Report example
 
 <img src="images/report_example.png" width="600"/>
@@ -16,7 +19,7 @@ missing from test_file.py to reach 100% conditional coverage.
 python3 conditional_testing.py <code_file.py> <testing_files.py>
 ```
 
-### For the code and testing files provided in the repository (several testing files separated by spaces can be entered):
+### For the code and testing files provided in the repository:
 ```bash
 python3 conditional_testing.py sample_code.py test_file.py tests_missing.py
 ```
