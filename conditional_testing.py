@@ -69,11 +69,31 @@ class CallReroute(ast.NodeTransformer):
     def __init__(self, test_name, target_functions):
         self.test_name = test_name
         self.target_functions = target_functions
+        self.assert_count = 0
 
     def visit_ImportFrom(self, node):
         if node.module == self.test_name:
             return None
         return node
+
+    def visit_Assert(self, node):
+        if not isinstance(node.test, ast.Compare):
+            return node
+
+        call_node = node.test.left
+
+        if isinstance(call_node, ast.Call) and isinstance(call_node.func, ast.Name) and call_node.func.id in self.target_functions:
+            self.assert_count += 1
+            function_name = f"test_assert_{self.assert_count}"
+            CallParse(self.target_functions).visit(call_node)
+
+            assert_call = ast.FunctionDef(name = function_name,
+                                              args = ast.arguments(posonlyargs = [], args = [], vararg = None, kwonlyargs = [], kw_defaults = [], kwarg = None, defaults = []),
+                                              body = [ast.Expr(value = call_node)], decorator_list = [], returns = None)
+
+            return assert_call
+
+        return self.generic_visit(node)
 
     def visit_FunctionDef(self, node):
         if str(node.name)[:5] == 'test_':
@@ -134,6 +154,9 @@ def tests_run(test_files, exec_scope, code_file):
         except FileNotFoundError:
             print(f"Error: Provided file {test_file} cannot be found", file = sys.stderr)
             continue
+        except AssertionError:
+            print(f"Error: Assertion error in {test_file}", file=sys.stderr)
+            continue
         except Exception as e:
             print(f"Error: Execution of {test_file} failed: {e}", file = sys.stderr)
             continue
@@ -148,13 +171,15 @@ def tests_run(test_files, exec_scope, code_file):
             print("Warning: A test function should start with 'test_'")
             continue
 
-        print(f"Found {len(to_test)} tests in {test_file}")
-
         for test_name, test_func in to_test:
             try:
                 test_func()
+            except AssertionError:
+                print(f"Error: Assertion error in {test_file}", file=sys.stderr)
+                sys.exit(1)
             except Exception as e:
                 print(f"Error: Test {test_name} in {test_file} failed: {e}", file = sys.stderr)
+                sys.exit(1)
 
 
 def testing_report(ast_parser):
@@ -244,10 +269,10 @@ def testing_report(ast_parser):
 
 def loading_report(args):
     terminal_width = shutil.get_terminal_size().columns
+    print("")
     print("=" * (terminal_width // 2 - 11) +" test session starts " + "=" * (terminal_width // 2 - 11))
     print(f"Code File: {args.code_file}")
     print(f"Test Files: {", ".join(set(args.test_files))}")
-    print("")
 
 
 def main():
